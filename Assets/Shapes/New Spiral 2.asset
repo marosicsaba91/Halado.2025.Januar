@@ -12,10 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0f4cd99459b410d44bb8a7f432afda0c, type: 3}
   m_Name: New Spiral 2
   m_EditorClassIdentifier: 
-  start: {x: 0, y: 1, z: 0}
-  end: {x: 0, y: -1, z: 0}
-  radius: 1
-  waveCount: 1
-  startPhase: 0
-  phaseChangeOverTime: 0
-  closeOnEnds: 0
+  start: {x: -10, y: 0, z: 0}
+  end: {x: 10, y: 0, z: 0}
+  maxRadius: 1
+  waveCount: 6.65
+  startPhase: 2.85
+  phaseChangeOverTime: 3.71
+  closeOnEnds: 1
