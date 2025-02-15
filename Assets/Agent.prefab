@@ -363,6 +363,7 @@ MonoBehaviour:
   startHP: 100
   healthBar: {fileID: 5325597697123949059}
   targetTransform: {fileID: 2599854597927733458}
+  navMeshAgent: {fileID: 8549999685340544390}
 --- !u!114 &114062389757251263
 MonoBehaviour:
   m_ObjectHideFlags: 0

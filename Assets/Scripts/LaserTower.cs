@@ -1,35 +1,38 @@
-using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 [SelectionBase]
-public class LaserTower : MonoBehaviour
+public class LaserTower : Tower
 {
-    [SerializeField] float range = 3;
-    [SerializeField] float damageRate = 10;
-    [SerializeField] Transform startPoint;
+    [Header("Laser")]
+    [SerializeField] AnimationCurve damageRateOverTime;
 
-
-    [Header("Laser visuals") ]
+    [Header("Visuals")]
     [SerializeField] LineRenderer laserLine;
-    [SerializeField, Min(2)] int PointCounts; 
-    [SerializeField] List<SinWave> waves;
-    [SerializeField] AnimationCurve distanceMultiplier;
-
-    Vector3 StartPoint => startPoint.transform.position;
-
+    [SerializeField] LinearShape lineShape;
+    [SerializeField, Min(2)] int pointCount;
+    
     Agent currentTarget;
+    float damageTime = 0;
 
     void Update()
     {
-        if (currentTarget!= null && !TowerDefenseUtil.IsInRange(StartPoint, range, currentTarget))
+        if (currentTarget != null && !IsInRange(StartPoint, range, currentTarget))
+        {
             currentTarget = null;
+            damageTime = 0;
+        }
 
         if (currentTarget == null)
-            currentTarget = TowerDefenseUtil.FindClosest(StartPoint, range);
-        
+        {
+            currentTarget = FindTarget();
+            damageTime = 0;
+        }
+
         if (currentTarget != null)
         {
+            float damageRate = damageRateOverTime.Evaluate(damageTime);
+            damageTime += Time.deltaTime;
+
             currentTarget.Damage(damageRate * Time.deltaTime);
             laserLine.enabled = true;
 
@@ -43,49 +46,11 @@ public class LaserTower : MonoBehaviour
 
     void SetLineRendererPoints()
     {
-        laserLine.positionCount = PointCounts;
+        laserLine.positionCount = pointCount;
 
-        Vector3 a = StartPoint;
-        Vector3 b = currentTarget.TargetPoint;
+        lineShape.start = StartPoint;
+        lineShape.end = currentTarget.TargetPoint;
 
-        float dm = distanceMultiplier.Evaluate(Vector3.Distance(a, b));
-
-
-        for (int i = 0; i < PointCounts; i++)
-        {
-            float t = i / (PointCounts - 1f);
-            Vector3 p = Vector3.Lerp(a, b, t);
-
-            /* EXTRA */
-
-            float m = (Mathf.Cos((t - 0.5f) * 2 * Mathf.PI) + 1) / 2;
-
-            foreach (var wave in waves)
-                p += wave.Evaluate(Time.time, p.x) * m * dm;
-
-            /* EXTRA */
-
-            laserLine.SetPosition(i, p);
-        }
-    }
-
-    void OnDrawGizmosSelected()
-    {
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(StartPoint, range);
-    }
-}
-
-[Serializable]
-class SinWave
-{
-    public Vector3 amplitude = Vector3.up;
-    public float frequency = 5;
-    public float phase = 0;
-    public float speed = 1;
-
-    public Vector3 Evaluate(float time, float position)
-    {
-        return amplitude * Mathf.Sin(phase + frequency * time + position * speed);
+        laserLine.SetPositions(lineShape.GetPoints(pointCount));
     }
 }

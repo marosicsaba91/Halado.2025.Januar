@@ -1,11 +1,11 @@
 using System.Collections;
 using UnityEngine;
 
-public class GunTower : MonoBehaviour
+public class GunTower : Tower
 {
+    [Header("Gun")]
     [SerializeField] float damage = 10;
-    [SerializeField] float damageDuration = 0.5f;
-    [SerializeField] float range = 3;
+    [SerializeField] float damageDuration = 0.5f; 
 
     void Start()
     {
@@ -18,16 +18,10 @@ public class GunTower : MonoBehaviour
         {
             yield return new WaitForSeconds(damageDuration);
 
-            Agent target = TowerDefenseUtil.FindClosest(transform.position, range);
+            Agent target = FindTarget();
 
             if (target != null)
                 target.Damage(damage);
         }
-    }
-
-    void OnDrawGizmosSelected()
-    {
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, range);        
     }
 }
